@@ -32,12 +32,12 @@ const login: Action = async ({ cookies, request }) => {
 	const user = db.user.find((user) => user.username === username)
 
 	if (!user) {
-		throw error(400, { invalid: true })
+		throw error(400, { invalid: true, issue: 'User doesnt exist', db })
 	}
 
 	// compare password
 	if (user.password !== password) {
-		throw error(400, { invalid: true })
+		throw error(400, { invalid: true, issue: 'Password', db })
 	}
 
 	// const userPassword = await bcrypt.compare(password, user.passwordHash)
