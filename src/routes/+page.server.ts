@@ -1,6 +1,6 @@
 // +page.server.ts
-import { invalid, redirect } from '@sveltejs/kit'
-import type { Actions } from './$types'
+import { error, redirect } from '@sveltejs/kit'
+import type { Actions } from './login/$types'
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
@@ -16,6 +16,6 @@ export const actions: Actions = {
 			})
 			throw redirect(302, '/')
 		}
-		return invalid(400, { error: 'Invalid login or password' })
+		return error(400, { error: 'Invalid login or password' })
 	},
 }
