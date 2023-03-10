@@ -1,8 +1,10 @@
-import { invalid, redirect } from '@sveltejs/kit'
-import bcrypt from 'bcrypt'
+import { error, redirect } from '@sveltejs/kit'
+
 import type { Action, Actions, PageServerLoad } from './$types'
 
 import { db } from '$lib/database'
+
+import jwt from 'jsonwebtoken'
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// redirect user if logged in
@@ -22,28 +24,44 @@ const login: Action = async ({ cookies, request }) => {
 		!username ||
 		!password
 	) {
-		return invalid(400, { invalid: true })
+		// return invalidate(400, { invalid: true })
+		throw error(400, { invalid: true })
 	}
 
-	const user = await db.user.findUnique({ where: { username } })
+	// const user = await db.user.findUnique({ where: { username } })
+	const user = db.user.find((user) => user.username === username)
 
 	if (!user) {
-		return invalid(400, { credentials: true })
+		throw error(400, { invalid: true })
 	}
 
-	const userPassword = await bcrypt.compare(password, user.passwordHash)
-
-	if (!userPassword) {
-		return invalid(400, { credentials: true })
+	// compare password
+	if (user.password !== password) {
+		throw error(400, { invalid: true })
 	}
 
-	// generate new auth token just in case
-	const authenticatedUser = await db.user.update({
-		where: { username: user.username },
-		data: { userAuthToken: crypto.randomUUID() },
-	})
+	// const userPassword = await bcrypt.compare(password, user.passwordHash)
 
-	cookies.set('session', authenticatedUser.userAuthToken, {
+	// if (!userPassword) {
+	// 	throw error(400, { invalid: true })
+	// }
+	// generate new jwt token
+
+	const newToken = jwt.sign(
+		{
+			id: user.id,
+			username: user.username,
+			role: user.name,
+		},
+		'SECRET',
+		{
+			expiresIn: '1d',
+		}
+	)
+
+	user.token = newToken
+
+	cookies.set('session', newToken, {
 		// send cookie for every page
 		path: '/',
 		// server side only cookie so you can't use `document.cookie`

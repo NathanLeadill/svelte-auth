@@ -1,5 +1,5 @@
-import type { Handle } from '@sveltejs/kit'
 import { db } from '$lib/database'
+import type { Handle } from '@sveltejs/kit'
 
 /*
 	You can use a custom redirect if you want...
@@ -35,16 +35,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	// find the user based on the session
-	const user = await db.user.findUnique({
-		where: { userAuthToken: session },
-		select: { username: true, role: true },
-	})
+	const user = db.user.find((user) => user.token === session)
 
 	// if `user` exists set `events.local`
 	if (user) {
 		event.locals.user = {
 			name: user.username,
-			role: user.role.name,
+			role: user.name,
+			token: user.token,
 		}
 	}
 

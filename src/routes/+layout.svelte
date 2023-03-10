@@ -34,7 +34,11 @@
 		</form>
 	{/if}
 </nav>
-
+{#if $page.data.user}
+	<pre>
+		{JSON.stringify($page.data.user, null, 2)}
+	</pre>
+{/if}
 <main>
 	<slot />
 </main>
