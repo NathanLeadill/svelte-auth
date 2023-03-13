@@ -2,8 +2,6 @@
 	import { applyAction, enhance } from '$app/forms'
 	import { invalidateAll } from '$app/navigation'
 	import { page } from '$app/stores'
-
-	// import '../styles/app.css'
 </script>
 
 <svelte:head>
