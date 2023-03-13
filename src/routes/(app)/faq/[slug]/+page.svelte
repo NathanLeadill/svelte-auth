@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import type { FaqContent } from '$lib/types/content'
+	// import type { FaqContent } from '$lib/types/content'
 	import content from '../data.json'
 	import Panel from './_components/panel.svelte'
 
