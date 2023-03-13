@@ -2,8 +2,8 @@ import { jsonResponse } from '$lib/helpers'
 import jwt from 'jsonwebtoken'
 
 export async function POST({ request }) {
-	const { username, password } = await request.json()
-	const token = await signIn(username, password)
+	const { email, password } = await request.json()
+	const token = await signIn(email, password)
 	if (!token) {
 		return jsonResponse({ message: 'Invalid username or password' }, 401)
 	}
