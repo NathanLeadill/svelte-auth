@@ -54,7 +54,7 @@
 
 {#if !$page.data.user}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<p class="log-in" on:click={goToLoginPage}>Log in</p>
+	<button class="sign-in-button" on:click={goToLoginPage}> Log in </button>
 {:else}
 	<div
 		class="signedInText"
@@ -176,6 +176,17 @@
 		text-decoration: none;
 		padding: 6.5px 12px;
 		border-radius: 6px;
+	}
+
+	.sign-in-button {
+		background: none;
+		font-size: 12px;
+		padding: 12.5px 30px;
+	}
+
+	.sign-in-button:hover {
+		cursor: pointer;
+		background: #353d57;
 	}
 
 	@media only screen and (max-width: 768px) {
