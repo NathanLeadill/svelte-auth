@@ -3,7 +3,7 @@
 	import { invalidateAll } from '$app/navigation'
 	import { page } from '$app/stores'
 
-	import '../styles/app.css'
+	// import '../styles/app.css'
 </script>
 
 <svelte:head>
