@@ -54,7 +54,13 @@
 
 {#if !$page.data.user}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<button class="sign-in-button" on:click={goToLoginPage}> Log in </button>
+	<button
+		class:white={type === 'white'}
+		class="sign-in-button"
+		on:click={goToLoginPage}
+	>
+		Log in
+	</button>
 {:else}
 	<div
 		class="signedInText"
@@ -182,11 +188,20 @@
 		background: none;
 		font-size: 12px;
 		padding: 12.5px 30px;
+		color: black;
+	}
+
+	.white.sign-in-button {
+		color: white;
 	}
 
 	.sign-in-button:hover {
 		cursor: pointer;
 		background: #353d57;
+	}
+
+	.white.sign-in-button:hover {
+		background: #8c909eb0;
 	}
 
 	@media only screen and (max-width: 768px) {
