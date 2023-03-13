@@ -55,7 +55,7 @@
 							<a href="/explore/malta">Explore Malta</a>
 						</li>
 						<div class="grow" />
-						<!-- <li class="header-item"><SignInMenu /></li> -->
+						<li class="header-item"><SignInMenu /></li>
 						<li class="header-item">
 							<a href="/#book-trip"
 								><button class="book-trip-button">Book a trip</button></a

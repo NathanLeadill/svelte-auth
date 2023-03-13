@@ -23,7 +23,7 @@
 	}
 
 	async function runLogout() {
-		const response = await fetch('/api/auth/signout', {
+		const response = await fetch('/api/auth/logout', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -32,7 +32,18 @@
 				token: $page.data.user.token,
 			}),
 		})
-		return await response.json()
+		const { status } = await response.json()
+		if (status === 'success') {
+			goto('/', {
+				replaceState: true,
+				invalidateAll: true,
+			})
+		}
+	}
+
+	function goToPage(page: string) {
+		signInMenuOpen = false
+		goto(page)
 	}
 
 	function goToLoginPage() {
@@ -70,8 +81,10 @@
 			on:keydown={handleKeypress}
 			use:clickOutside={toggleSignInMenu}
 		>
-			<a class="menu-item active" href="/user/profile">Profile</a>
-			<a class="menu-item" href="/my-trips">My Trips</a>
+			<a class="menu-item active" on:click={() => goToPage('/user/profile')}>
+				Profile
+			</a>
+			<a class="menu-item" on:click={() => goToPage('/my-trips')}> My Trips </a>
 			<p class="menu-item" on:click={runLogout}>Log out</p>
 		</div>
 	{/if}
@@ -108,7 +121,7 @@
 		margin: 0;
 	}
 
-	p.menu-item:hover {
+	.menu-item:hover {
 		cursor: pointer;
 		background: rgba(44, 48, 78, 0.1);
 	}

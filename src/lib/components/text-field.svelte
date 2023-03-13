@@ -7,7 +7,7 @@
 	export let readOnly = false
 	export let id: string | undefined = undefined
 	export let value: Value = '' as Value
-	export let name: string
+	export let name = ''
 	export let type: Type = (
 		typeof value === 'number' ? 'number' : 'text'
 	) as Type
