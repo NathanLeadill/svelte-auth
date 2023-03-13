@@ -68,7 +68,7 @@
 				</p>
 			{/if}
 		</div>
-	</AuthLayout>
+	</AuthTemplate>
 </div>
 
 <style>

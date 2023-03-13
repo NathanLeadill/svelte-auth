@@ -2,7 +2,6 @@
 	import TextField from '$lib/components/text-field.svelte'
 	import AuthTemplate from '$lib/templates/auth-template.svelte'
 
-
 	const inputData = {
 		email: '',
 	}
@@ -57,7 +56,7 @@
 				</p>
 			{/if}
 		</div>
-	</AuthLayout>
+	</AuthTemplate>
 </div>
 
 <style>
