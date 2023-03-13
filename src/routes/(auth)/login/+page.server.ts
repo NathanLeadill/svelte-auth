@@ -27,7 +27,11 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 		!password
 	) {
 		// return invalidate(400, { invalid: true })
-		throw error(403, 'Invalid email or password')
+		return fail(403, {
+			email,
+			incorrect: true,
+			error: 'Missing email or password',
+		})
 	}
 
 	const req = await fetch('/api/login', {

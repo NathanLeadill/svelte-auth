@@ -11,19 +11,16 @@ export async function POST({ request }) {
 }
 
 async function signIn(email: string, password: string) {
-	const data = await fetch(
-		'https://api.spex.snowfalltravel.com/mtr/accounts/login',
-		{
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				email,
-				password,
-			}),
-		}
-	)
+	const data = await fetch('https://tardis.junction.dev/mtr/accounts/login', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			email,
+			password,
+		}),
+	})
 	const user = await data.json()
 
 	if (!user || user.status == 'fail') {
