@@ -9,21 +9,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 }
 
-const signin: Action = async ({ cookies, request, fetch }) => {
+const login: Action = async ({ cookies, request, fetch }) => {
 	const data = await request.formData()
-	const email = data.get('email')
+	const username = data.get('username')
 	const password = data.get('password')
 
-	console.log('DATA', email, password)
-
 	if (
-		typeof email !== 'string' ||
+		typeof username !== 'string' ||
 		typeof password !== 'string' ||
-		!email ||
+		!username ||
 		!password
 	) {
 		// return invalidate(400, { invalid: true })
-		throw error(403, 'Invalid email or password')
+		throw error(400, { invalid: true })
 	}
 
 	const req = await fetch('/api/login', {
@@ -32,7 +30,7 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify({
-			email,
+			username,
 			password,
 		}),
 	})
@@ -42,9 +40,11 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 		throw error(401, 'Login could not be performed')
 	}
 
+	console.log('BODY', body.token)
+
 	const user = jwt.verify(body.token, 'SECRET')
 	if (!user) {
-		throw error(400, { invalid: true, error: 'Couldnt login' })
+		throw error(400, { invalid: true, issue: 'User doesnt exist', db })
 	}
 	cookies.set('session', body.token, {
 		// send cookie for every page
@@ -64,4 +64,4 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 	throw redirect(302, '/')
 }
 
-export const actions: Actions = { signin }
+export const actions: Actions = { login }
