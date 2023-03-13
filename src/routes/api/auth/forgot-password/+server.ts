@@ -3,8 +3,10 @@ import { jsonResponse } from '$lib/helpers'
 export async function POST({ request }) {
 	const body = await request.json()
 	const { email } = body
-	const response = await fetch(
-		'https://tardis.junction.dev/mtr/accounts/forgotpassword',
+	console.log('Email', email)
+
+	const req = await fetch(
+		'https://api.spex.snowfalltravel.com/mtr/accounts/forgotpassword',
 		{
 			method: 'POST',
 			headers: {
@@ -15,7 +17,8 @@ export async function POST({ request }) {
 			}),
 		}
 	)
-	const { status } = await response.json()
+	const resp = await req.json()
+	console.log('Body', resp)
 
-	return jsonResponse(status, 200)
+	return jsonResponse(resp, 200)
 }
