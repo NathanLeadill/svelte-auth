@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit'
+import { error, fail, redirect } from '@sveltejs/kit'
 import jwt from 'jsonwebtoken'
 import type { Action, Actions, PageServerLoad } from './$types'
 
@@ -15,6 +15,10 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 	const password = data.get('password')
 
 	console.log('DATA', email, password)
+
+	if (!email || typeof email !== 'string') {
+		return fail(400, { email, incorrect: true, error: 'Invalid email' })
+	}
 
 	if (
 		typeof email !== 'string' ||
@@ -39,7 +43,8 @@ const signin: Action = async ({ cookies, request, fetch }) => {
 
 	const body = await req.json()
 	if (!body.token) {
-		throw error(401, 'Login could not be performed')
+		// throw error(401, 'Login could not be performed')
+		return fail(403, { email, incorrect: true })
 	}
 
 	const user = jwt.verify(body.token, 'SECRET')

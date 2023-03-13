@@ -45,6 +45,8 @@
 		/>
 
 		<button type="submit">Log in</button>
+		{#if form?.incorrect}<p class="form-error">Invalid credentials!</p>{/if}
+
 		<!-- {#if error}
 			<p class="error-message">Error: Insert Generic Error Message Here</p>
 		{/if} -->
@@ -56,7 +58,6 @@
 <p class="forgot">
 	<a href="/forgot-password">I have forgotten my details</a>
 </p>
->
 
 <style>
 	.register-footer {
@@ -91,7 +92,7 @@
 	p.forgot a {
 		font-weight: 400;
 	}
-	.error-message {
+	.form-error {
 		color: red;
 		font-size: 18px;
 		font-weight: 400;

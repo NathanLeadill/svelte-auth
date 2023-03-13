@@ -186,7 +186,7 @@
 
 	.sign-in-button {
 		background: none;
-		font-size: 12px;
+		font-size: 14px;
 		padding: 12.5px 30px;
 		color: black;
 	}
@@ -198,6 +198,7 @@
 	.sign-in-button:hover {
 		cursor: pointer;
 		background: #353d57;
+		color: white;
 	}
 
 	.white.sign-in-button:hover {
