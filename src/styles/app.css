@@ -23,7 +23,6 @@
 	align-items: center;
 }
 body {
-	margin-top: 200px;
 	min-height: 100vh;
 	margin: 0;
 	background-attachment: fixed;
@@ -40,6 +39,11 @@ body {
 			var(--color-bg-1) 15%,
 			var(--color-bg-2) 50%
 		);
+	font-family: 'Montserrat';
+}
+
+label {
+	font-family: 'Montserrat';
 }
 
 h1,

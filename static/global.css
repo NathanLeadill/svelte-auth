@@ -2,6 +2,13 @@
 	--snowfall-blue: #22283b;
 }
 
+body {
+	font-family: 'Montserrat';
+}
+p,
+label {
+	font-family: 'Montserrat';
+}
 .container {
 	max-width: 90%;
 	align-items: center;

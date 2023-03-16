@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment'
 	import { goto } from '$app/navigation'
+	import SearchBox from '$lib/components/search-box.svelte'
 	import type { SearchOptions } from '$lib/types/destination'
 	import Swal from 'sweetalert2'
 
@@ -44,17 +45,16 @@
 			].join(','),
 			origin: inputOptions.location.from.toLocaleLowerCase(),
 			passengers: JSON.stringify(inputOptions.passengers),
-			outboundDate: new Date(departureDate - tzOffset).toISOString(),
-			inboundDate: new Date(returnDate - tzOffset).toISOString(),
+			outboundDate: new Date(departureDate.getTime() - tzOffset).toISOString(),
+			inboundDate: new Date(returnDate.getTime() - tzOffset).toISOString(),
 		}
 
-		// convert searchObject to URLParams
 		if (browser) {
-			const url = new URL('book-trip', window.location.origin)
-			url.search = new URLSearchParams({
-				...searchObject,
-			}).toString()
-			goto(url.toString())
+			goto('/book-trip', {
+				state: {
+					...searchObject,
+				},
+			})
 		}
 	}
 </script>
@@ -66,7 +66,7 @@
 		<h1 class="hero-title">Travel made easier</h1>
 		<h3 class="hero-tag">Your trip starts here with faster travel</h3>
 		<div class="searchbox-box" id="book-trip">
-			<!-- <SearchBox onSubmit={submitSearchForJourney} /> -->
+			<SearchBox onSubmit={submitSearchForJourney} />
 		</div>
 	</div>
 </div>

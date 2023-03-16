@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { applyAction, enhance } from '$app/forms'
+	import { invalidateAll } from '$app/navigation'
 	import TextField from '$lib/components/text-field.svelte'
 	import AuthTemplate from '$lib/templates/auth-template.svelte'
 
@@ -8,18 +10,18 @@
 
 	let forgotStatus = ''
 
-	async function forgotPasswordHandler() {
-		const returnData = await fetch('/api/auth/forgot-password', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(inputData),
-		})
+	// async function forgotPasswordHandler() {
+	// 	const returnData = await fetch('/api/auth/forgot-password', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'Content-Type': 'application/json',
+	// 		},
+	// 		body: JSON.stringify(inputData),
+	// 	})
 
-		const { status } = await returnData.json()
-		forgotStatus = status
-	}
+	// 	const { status } = await returnData.json()
+	// 	forgotStatus = status
+	// }
 </script>
 
 <div class="forgot-password-container">
@@ -29,14 +31,21 @@
 			Enter your email and we will send you a link to create a new password.
 		</p>
 		<form
-			on:submit|preventDefault={forgotPasswordHandler}
 			class="login-form"
 			slot="form"
+			method="POST"
+			use:enhance={() => {
+				return async ({ result }) => {
+					invalidateAll()
+					await applyAction(result)
+				}
+			}}
 		>
 			<label for="email">Email address</label>
 			<TextField
 				id="email"
 				type="email"
+				name="email"
 				bind:value={inputData.email}
 				placeholder="Enter your email"
 			/>
@@ -60,6 +69,9 @@
 </div>
 
 <style>
+	.forgot-password-container {
+		margin: 50px 0;
+	}
 	.forgot-password-footer {
 		margin-top: 43px;
 		background-color: #f7f7f7;

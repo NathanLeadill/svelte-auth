@@ -18,7 +18,5 @@ export async function POST({ request }) {
 		}
 	)
 	const resp = await req.json()
-	console.log('Body', resp)
-
 	return jsonResponse(resp, 200)
 }
