@@ -2,6 +2,7 @@
 	import JourneyCard from '$lib/components/journey-card.svelte'
 	import type { ScheduleSelectedObj } from '$lib/types/schedules'
 	import TicketType from './ticket-type.svelte'
+	import VehicleInputs from './vehicle-inputs.svelte'
 	export let schedule: ScheduleType
 	export let type: JourneyType
 	export let journey: ScheduleType[]
@@ -14,19 +15,12 @@
 			product_id: 0,
 			vehicle: {
 				id: 0,
-				make: '',
+				make: 'test',
 				model: '',
 				registration: '',
 			},
 		},
 		inbound: {
-			train_id: 0,
-			schedule_id: 0,
-			product_id: 0,
-		},
-	}
-	export let test: Partial<ScheduleSelectedObj> = {
-		outbound: {
 			train_id: 0,
 			schedule_id: 0,
 			product_id: 0,
@@ -71,24 +65,27 @@
 			<div class="ticket-slots">
 				{#each schedule.products as product, i}
 					<!-- CHANGE SELECTED ROUTE GETTING LATE WANTED TO SLEEP -->
+
 					<TicketType
 						{product}
 						trainId={schedule.train_id}
-						scheduleId={schedule.schedule_id}
+						schedule_id={schedule.schedule_id}
 						ticketId={product.id}
-						{type}
 						{selected}
+						{type}
 						bind:group={selected}
 					/>
 				{/each}
 			</div>
 		</div>
 		<div class="vehicle-section">
-			<!-- <VehicleInputs
-				{selected}
-				{schedule}
-				bind:activeVehicle={selected[type].vehicle}
-			/> -->
+			{#if selected.outbound && selected.outbound.schedule_id}
+				<VehicleInputs
+					{selected}
+					{schedule}
+					bind:activeVehicle={selected.outbound.vehicle}
+				/>
+			{/if}
 		</div>
 	</div>
 {/if}

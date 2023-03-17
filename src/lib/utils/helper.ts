@@ -70,11 +70,11 @@ export function generateRoute(
 	const routeString = bookTripState[type as keyof typeof bookTripState]
 	// tjhrow error
 	if (typeof routeString !== 'string') return
-	const [ticketId, ferryId, scheduleId] = routeString.split('.')
+	const [ticketId, ferryId, schedule_id] = routeString.split('.')
 
 	const activeRoute = route.find(
 		(ferry: ScheduleType) =>
-			ferry.schedule_id === Number(scheduleId) &&
+			ferry.schedule_id === Number(schedule_id) &&
 			ferry.train_id === Number(ferryId)
 	)
 
@@ -158,6 +158,26 @@ export function createCookie(name: string, value: any, days: number): void {
 
 export function eraseCookie(name: string): void {
 	createCookie(name, '', -1)
+}
+
+export function getJourneyWithActiveRoute(
+	selectedJourney: ScheduleType,
+	passengers: PassengerDetailsType[],
+	vehicles: Vehicle,
+	options
+) {
+	console.log('selectedJourney', options)
+
+	return {
+		date: selectedJourney.travel_date,
+		destination_id: selectedJourney.destination_id,
+		origin_id: selectedJourney.origin_id,
+		schedule_id: selectedJourney.schedule_id,
+		product_id: options.ticketId,
+		matrix_batch_id: 0,
+		passengers: passengers,
+		vehicles: vehicles && vehicles.id !== 0 ? [vehicles] : [],
+	}
 }
 
 export function getJourney(

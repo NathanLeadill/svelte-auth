@@ -8,6 +8,7 @@
 		SearchData,
 	} from '$lib/types/destination'
 	import { onMount } from 'svelte'
+	import PassengerDetails from './_components/passenger-details.svelte'
 	import SelectJourney from './_components/select-journey.svelte'
 
 	export let data
@@ -68,6 +69,9 @@
 
 {#if !searchData?.directions}
 	<p>Redirecting...</p>
+	<pre>
+        {JSON.stringify(test, null, 2)}
+    </pre>
 {:else}
 	<Wizard
 		steps={{
@@ -96,16 +100,13 @@
 						bind:passengerInfo
 					/>
 				{:else if value === 'passenger-details'}
-					<pre>
-                    {JSON.stringify(selected)}
+					<PassengerDetails selected={test} />
+					<div class="container">
+						<h1>test</h1>
+						<pre>
+                    {JSON.stringify(test)}
                 </pre>
-					<!-- {:else if value === 'passenger-details'}
-				<PassengerDetails
-					{goToNext}
-					{searchData}
-					bind:journey
-					bind:passengerDetails
-				/> -->
+					</div>
 				{/if}
 			</div>
 			<!-- <div class="summary-column">
@@ -130,6 +131,9 @@
 
 	.summary-column {
 		flex-basis: 30%;
+	}
+	.container {
+		margin: 100px auto;
 	}
 	@media only screen and (max-width: 768px) {
 		.column-container {

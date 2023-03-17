@@ -3,11 +3,23 @@
 
 	export let product: TicketProduct
 	export let trainId: number
-	export let scheduleId: number
+	export let schedule_id: number
 	export let ticketId: number
 	export let type: keyof typeof group
 	export let group: ScheduleSelectedObj
-	export let selected: ScheduleSelectedObj
+	export let selected: Partial<ScheduleSelectedObj>
+	/**
+	 * class:active={schedule_id === selected[type].schedule_id &&
+			ticketId === selected[type].ticketId}
+	*/
+	console.log(
+		'Selected',
+		selected[type],
+		' schedule_id',
+		schedule_id,
+		' ticketId',
+		ticketId
+	)
 </script>
 
 <label class="label">
@@ -16,18 +28,20 @@
 		value={{
 			...selected[type],
 			trainId,
-			scheduleId,
+			schedule_id,
 			ticketId,
 		}}
 		bind:group={group[type]}
 	/>
 	<div
 		class="ticket"
-		class:active={scheduleId === selected[type].scheduleId &&
-			ticketId === selected[type].ticketId}
+		class:active={selected &&
+			selected[type] &&
+			selected[type].schedule_id === schedule_id &&
+			selected[type].ticketId === ticketId}
 	>
 		<span class="ticket-type-heading">{product.name}</span>
-
+		<span>{schedule_id}</span>
 		<p class="ticket-type-description">{product.description}</p>
 		<p class="ticket-type-price">
 			<span class="currency" />

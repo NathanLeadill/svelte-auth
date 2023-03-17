@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms'
-	import { invalidateAll } from '$app/navigation'
 	import Loading from '$lib/components/loading.svelte'
+	import { generateTransactionData } from '$lib/helpers'
 	import type {
 		JourneyType,
 		JourneyWithPassengers,
@@ -31,12 +30,27 @@
 			train_id: 0,
 			schedule_id: 0,
 			product_id: 0,
-			vehicle: {},
+			vehicle: {
+				id: 0,
+				make: '',
+				model: '',
+				registration: '',
+			},
 		},
 		inbound: {
 			train_id: 0,
 			schedule_id: 0,
 			product_id: 0,
+			vehicle: {
+				id: 0,
+				make: '',
+				model: '',
+				registration: '',
+			},
+		},
+		tokens: {
+			token: '',
+			products_token: '',
 		},
 	}
 
@@ -62,26 +76,75 @@
 
 		if (status === 'success') {
 			journey = {
-				outbound: sched.outbound,
-				inbound: sched.inbound,
+				// outbound: sched.outbound,
+				// inbound: sched.inbound,
 				transaction, // Do we need to pass this here?
 			}
 			passengerInfo = transaction
 			schedule = sched
+			console.log('Transaction', transaction)
 
+			// alternative
+			bookingState.update((prev) => ({
+				tokens: {
+					token: transaction.token,
+					products_token: sched.token,
+				},
+				searchData,
+				journey: {
+					outbound: [
+						...sched.outbound.map((el) => ({
+							...el,
+							passengers: transaction.outbound.passengers,
+						})),
+					],
+					inbound: sched.inbound,
+				},
+			}))
+		}
+	}
+
+	async function addProduct() {
+		//  @TODO TEMP FIX FOR DEMO NEED TO FILTER
+		const activeRoute = schedule.outbound.find(
+			(route) => route.schedule_id === selected.outbound.schedule_id
+		)
+
+		const generatedPayload = generateTransactionData(
+			searchData,
+			schedule,
+			$bookingState.tokens,
+			passengerInfo.outbound.passengers,
+			selected
+		)
+
+		const req = await fetch('/api/journey/transaction', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(generatedPayload),
+		})
+
+		const {
+			status,
+			data: { transaction },
+		} = await req.json()
+
+		if (status === 'success') {
 			bookingState.update((prev) => ({
 				...prev,
-				token: transaction.token,
-				product_token: sched.token,
+				journey: {
+					outbound: transaction.outbound,
+					inbound: transaction.inbound,
+				},
+				price: {
+					amount: transaction.amount,
+					vat: transaction.vat,
+					tax: transaction.tax,
+				},
 			}))
-
-			/**
-             * bookTrip.update((prev) => ({
-				...prev,
-				token: transaction.token,
-				products_token: schedules.token
-			}));
-            */
+			goToNext()
 		}
 	}
 
@@ -93,62 +156,44 @@
 <div class="select-container">
 	<div class="book-trip-layout">
 		<div class="journey">
-			<form
-				class="login-form"
-				method="POST"
-				action="?/addProductAndVehicles"
-				use:enhance={() => {
-					return async ({ result }) => {
-						invalidateAll()
-						await applyAction(result)
-						console.log('TESTFF')
-						goToNext()
-					}
-				}}
-			>
-				<input value={JSON.stringify(selected)} type="hidden" name="selected" />
-				<div class="results-container">
-					{#if schedule}
-						<h1 class="heading">Select outbound journey</h1>
-						{schedule.outbound.length}
-						{#if schedule.outbound.length === 0}
+			<div class="results-container">
+				{#if schedule}
+					<h1 class="heading">Select outbound journey</h1>
+					<pre>
+                        {JSON.stringify(selected)}
+                    </pre>
+					{#if schedule.outbound.length === 0}
+						<Loading progress={true} />
+						<div class="white-card" />
+					{:else}
+						{#each schedule.outbound as outbound}
+							<TimeSlot
+								bind:selected
+								schedule={outbound}
+								journey={schedule.outbound}
+								type="outbound"
+							/>
+						{/each}
+					{/if}
+					{#if searchData.directions.includes('inbound')}
+						<h1 class="heading">Select inbound journey</h1>
+						{#if schedule.inbound.length === 0}
 							<Loading progress={true} />
 							<div class="white-card" />
 						{:else}
-							{#each schedule.outbound as outbound}
+							{#each schedule.inbound as inbound}
 								<TimeSlot
 									bind:selected
-									schedule={outbound}
-									journey={journey.outbound}
-									type="outbound"
+									schedule={inbound}
+									journey={schedule.inbound}
+									type="inbound"
 								/>
 							{/each}
 						{/if}
-						{#if searchData.directions.includes('inbound')}
-							<h1 class="heading">Select inbound journey</h1>
-							{#if schedule.inbound.length === 0}
-								<Loading progress={true} />
-								<div class="white-card" />
-							{:else}
-								{#each schedule.inbound as inbound}
-									<TimeSlot
-										bind:selected
-										schedule={inbound}
-										journey={journey.inbound}
-										type="inbound"
-									/>
-								{/each}
-							{/if}
-						{/if}
 					{/if}
-				</div>
-				<button type="submit">Submit</button>
-			</form>
-			<button
-				on:click={() => {
-					goToNext()
-				}}>Next</button
-			>
+				{/if}
+			</div>
+			<button class="next" on:click={addProduct}>Next</button>
 		</div>
 	</div>
 </div>

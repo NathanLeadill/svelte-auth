@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
+	import { bookingState } from '$lib/utils/stores'
 
 	type TSteps = $$Generic<Record<string, string>>
 	type TValue = Readonly<keyof TSteps>
@@ -43,6 +44,25 @@
 		}
 	}
 
+	function goToNextWithNewState(state): void {
+		value = ids[Math.min(idCount - 1, activeIndex + 1)]
+
+		if (urlNavigation) {
+			const nextUrl = new URL($page.url)
+
+			if (value === ids[0]) {
+				nextUrl.searchParams.delete(queryParamKey)
+			} else {
+				nextUrl.searchParams.set(queryParamKey, value as string)
+			}
+
+			goto(nextUrl.toString(), {
+				replaceState: true,
+				state: state,
+			})
+		}
+	}
+
 	function goToNext(): void {
 		value = ids[Math.min(idCount - 1, activeIndex + 1)]
 
@@ -55,6 +75,10 @@
 		navigate()
 	}
 </script>
+
+<pre>
+    {JSON.stringify($bookingState)}
+</pre>
 
 <div class="wizard">
 	<div class="header-bar">

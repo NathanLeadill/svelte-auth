@@ -52,11 +52,7 @@
 	const fetchCars = fetchCarMakes()
 </script>
 
-<!-- ADD TYPES FROM ROBERTS CODE -->
-
-<pre />
-
-{#if selected[type].scheduleId === schedule.schedule_id}
+{#if selected[type].schedule_id === schedule.schedule_id}
 	<hr class="ticket-separate" />
 	<div class="ticket-options">
 		<div class="travel-option-select">
@@ -69,9 +65,12 @@
 			/>
 		</div>
 	</div>
-	{#if selected[type].vehicle.id === 2}
+	<pre>
+	{JSON.stringify(selected[type].vehicle)}
+	</pre>
+	{#if selected[type].vehicle?.id === 2}
 		<div class="vehicle-options">
-			<div>
+			<div class="form-group">
 				{#await fetchCars then data}
 					<label for="make">Make of vehicle:</label>
 					<SearchableSelectField
@@ -84,7 +83,7 @@
 					/>
 				{/await}
 			</div>
-			<div>
+			<div class="form-group">
 				{#if selected[type].vehicle.make !== ''}
 					{#if models && models.length > 0}
 						<label for="model">Model of vehicle:</label>
@@ -97,7 +96,7 @@
 				{/if}
 			</div>
 			{#if selected[type].vehicle.model !== ''}
-				<div class="registration-input">
+				<div class="registration-input form-group">
 					<label for="registration">Registration number:</label>
 					<TextField
 						id="registration"
@@ -107,18 +106,6 @@
 					/>
 				</div>
 			{/if}
-		</div>
-	{:else if selected[type].vehicle.id === 10}
-		<div class="vehicle-options">
-			<div>
-				<label for="registration">Registration number:</label>
-				<TextField
-					id="registration"
-					type="text"
-					bind:value={activeVehicle.registration}
-					placeholder="Registration number"
-				/>
-			</div>
 		</div>
 	{/if}
 {/if}
@@ -165,6 +152,12 @@
 		width: 100%;
 		box-sizing: border-box;
 		height: 42px;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
 	}
 
 	/* @TOOD */

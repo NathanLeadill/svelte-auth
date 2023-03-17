@@ -15,6 +15,7 @@
 	export let id: string | undefined = undefined
 	export let tabIndex = 0
 	export let error = ''
+	export let name = ''
 	export let readOnly = false
 	export let filled = false
 	export let decorator = false
@@ -93,6 +94,7 @@
 >
 	<div id="myDropdown" class:show={expanded} class="dropdown-content">
 		<!-- <Input bind:inputValue on:input={handleInput} /> -->
+		<input {name} value={eValue} hidden />
 		<TextField value={value ? value.label : ''} disabled />
 		{#if expanded}
 			<div class="body">

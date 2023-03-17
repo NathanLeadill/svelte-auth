@@ -4,7 +4,7 @@ import { writable } from 'svelte/store'
 export type BookTripState = {
 	trainId: number
 	ticketTypeId: number
-	scheduleId: number
+	schedule_id: number
 	outbound?: ScheduleType
 	inbound?: ScheduleType
 	vehicles: { inbound: Vehicle; outbound: Vehicle }
@@ -17,7 +17,7 @@ export type BookTripState = {
 export const bookTrip = writable<BookTripState>({
 	trainId: 0,
 	ticketTypeId: 0,
-	scheduleId: 0,
+	schedule_id: 0,
 	outbound: undefined,
 	inbound: undefined,
 	vehicles: {

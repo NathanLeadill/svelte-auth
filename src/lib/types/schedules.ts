@@ -1,4 +1,5 @@
 import type { PassengerDetailsType } from './account'
+import type { JourneyType, SearchData } from './destination'
 import type { VehicleType } from './transaction'
 
 export type TicketProduct = {
@@ -101,12 +102,20 @@ export type ScheduleSelectedObj = {
 		train_id: number
 		schedule_id: number
 		product_id: number
-		vehicle?: VehicleType
+		vehicle: VehicleType
 	}
 	inbound: {
 		train_id: number
 		schedule_id: number
 		product_id: number
-		vehicle?: VehicleType
+		vehicle: VehicleType
 	}
+	tokens: {
+		token: string
+		products_token: string
+	}
+	journey: JourneyType
+	searchData: SearchData
 }
+
+export type RouteDirection = 'outbound' | 'inbound'
