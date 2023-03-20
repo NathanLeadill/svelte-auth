@@ -22,6 +22,8 @@ export async function POST({
 		}
 	)
 	const data = await response.json()
+	console.log('Data', data)
+
 	return jsonResponse(
 		data.data.payment.transaction.outbound.passengers[0].qrCode,
 		200

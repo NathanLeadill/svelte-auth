@@ -6,7 +6,7 @@
 
 	async function fetchQRCode() {
 		const response = await fetch(
-			`/api/payment/verify/${$bookingState.tokens.token}`,
+			`/api/journey/payment/verify/${$bookingState.tokens.token}`,
 			{
 				method: 'POST',
 				headers: {
@@ -33,6 +33,9 @@
 			<Loading />
 		{:then data}
 			<img src={`data:image/png;base64, ${data}`} alt="QR Code" />
+			<pre>
+                {JSON.stringify(data)}
+            </pre>
 		{/await}
 		<p>
 			You will need to present this code when boarding the ferry. <a

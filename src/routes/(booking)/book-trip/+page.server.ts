@@ -161,7 +161,7 @@ export const actions = {
 		const resp = await response.json()
 
 		if (resp.status !== 'success') {
-			return fail(400, { error: 'internal Server Error' })
+			return fail(400, { error: 'internal Server Error', resp })
 		}
 
 		return {
