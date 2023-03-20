@@ -158,19 +158,14 @@ export const actions = {
 				token: token,
 			}),
 		})
-		const { status } = await response.json()
+		const resp = await response.json()
 
-		if (status !== 'success') {
+		if (resp.status !== 'success') {
 			return fail(400, { error: 'internal Server Error' })
 		}
 
 		return {
 			success: true,
-			promocode,
-			name,
-			number,
-			expireDate,
-			cvc,
 		}
 	},
 }

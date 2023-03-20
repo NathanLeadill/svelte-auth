@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Loading from '$lib/components/loading.svelte'
-	import { bookTrip } from '$lib/utils/stores'
+	import { bookingState, bookTrip } from '$lib/utils/stores'
 
 	const qrCode = fetchQRCode()
 
 	async function fetchQRCode() {
 		const response = await fetch(
-			`/api/payment/verify/${$bookTrip.state.token}`,
+			`/api/payment/verify/${$bookingState.tokens.token}`,
 			{
 				method: 'POST',
 				headers: {

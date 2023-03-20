@@ -127,8 +127,6 @@
 			}
 		)
 
-		console.log('GENERATED PAYLOAD', generatedPayload)
-
 		const req = await fetch('/api/journey/transaction', {
 			method: 'POST',
 			headers: {

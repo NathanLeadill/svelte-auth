@@ -33,6 +33,9 @@
 	let running = false
 </script>
 
+<pre>
+    {JSON.stringify(formResult)}
+</pre>
 <h1>Payment</h1>
 <div class="payment-form">
 	<form
@@ -43,13 +46,12 @@
 			return async ({ form, action, result }) => {
 				invalidateAll()
 				console.log('form', form, 'action', action, 'result', result)
+				if (result.type === 'success') {
+					return goToNext()
+				}
 				formResult = {
 					type: result.type,
 					errors: result.data,
-				}
-
-				if (result.type === 'success') {
-					goToNext()
 				}
 			}
 		}}

@@ -88,7 +88,9 @@
 			{#if value !== 'select-trip'}
 				<button on:click={goToPrevious}>Back</button>
 			{/if}
-			<button on:click={getLink}>Get Link</button>
+			<button disabled on:click={getLink} title="Disabled till nathan logs on"
+				>Get Link</button
+			>
 		</div>
 		<!-- TODO WHEN YOU SELECT A JOURNEY. UPDATE THE DAMN OBJECT!!!! -->
 		<div class="column-container" class:value>
