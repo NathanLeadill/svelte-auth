@@ -70,7 +70,7 @@ export function generateRoute(
 	const routeString = bookTripState[type as keyof typeof bookTripState]
 	// tjhrow error
 	if (typeof routeString !== 'string') return
-	const [ticketId, ferryId, schedule_id] = routeString.split('.')
+	const [product_id, ferryId, schedule_id] = routeString.split('.')
 
 	const activeRoute = route.find(
 		(ferry: ScheduleType) =>
@@ -80,7 +80,7 @@ export function generateRoute(
 
 	if (activeRoute.products.length > 0) {
 		const activeTicket = activeRoute.products.find(
-			(product: TicketProduct) => product.id === Number(ticketId)
+			(product: TicketProduct) => product.id === Number(product_id)
 		)
 		const {
 			departure_time,
@@ -166,17 +166,16 @@ export function getJourneyWithActiveRoute(
 	vehicles: Vehicle,
 	options
 ) {
-	console.log('selectedJourney', options)
-
 	return {
 		date: selectedJourney.travel_date,
 		destination_id: selectedJourney.destination_id,
 		origin_id: selectedJourney.origin_id,
 		schedule_id: selectedJourney.schedule_id,
-		product_id: options.ticketId,
+		product_id: options.product_id,
 		matrix_batch_id: 0,
 		passengers: passengers,
-		vehicles: vehicles && vehicles.id !== 0 ? [vehicles] : [],
+		vehicles:
+			options.vehicle && options.vehicle.id !== 0 ? [options.vehicle] : [],
 	}
 }
 
@@ -295,4 +294,44 @@ export async function runLogout(token: string) {
 		}),
 	})
 	return await response.json()
+}
+
+export function checkDateIs18YearsOlderThanToday(date: string) {
+	const today = new Date()
+	const eighteenYearsAgo = new Date(
+		today.getFullYear() - 18,
+		today.getMonth(),
+		today.getDate()
+	)
+	const dateOfBirth = new Date(date)
+	return eighteenYearsAgo > dateOfBirth
+}
+
+function timeStringToFloat(time: string) {
+	const hoursMinutes = time.split(/[.:]/)
+	const hours = parseInt(hoursMinutes[0], 10)
+	const minutes = hoursMinutes[1] ? parseInt(hoursMinutes[1], 10) : 0
+	return hours + minutes / 60
+}
+
+function convertFloatToTimeString(time: number) {
+	const hours = Math.floor(time)
+	const minutes = Math.floor((time - hours) * 60)
+	return hours + ':' + minutes
+}
+
+export function calculateJourneyDuration(
+	arrival_time: string,
+	departure_time: string,
+	format = false
+) {
+	const outboundDuration = timeStringToFloat(arrival_time)
+	const inboundDuration = timeStringToFloat(departure_time)
+	const duration = convertFloatToTimeString(
+		Number(outboundDuration - inboundDuration)
+	)
+	if (format) {
+		return duration.replace(':', 'h ') + ' m'
+	}
+	return duration
 }

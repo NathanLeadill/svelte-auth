@@ -1,5 +1,9 @@
 import type { PassengerDetailsType } from './account'
-import type { JourneyType, SearchData } from './destination'
+import type {
+	JourneyTransactionType,
+	JourneyType,
+	SearchData,
+} from './destination'
 import type { VehicleType } from './transaction'
 
 export type TicketProduct = {
@@ -87,9 +91,8 @@ export type ScheduleWithPassengers = ScheduleType & {
 
 // @TODO FIX TYPES
 export type ScheduleReturnType = {
-	outbound: any[]
-	inbound: any[]
-	token: string
+	outbound: JourneyTransactionType[]
+	inbound: JourneyTransactionType[]
 }
 
 export type ScheduleSelectedObject = {

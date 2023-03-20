@@ -19,9 +19,9 @@
 	<!-- <Footer /> -->
 </div>
 {#if $page.data.user}
-	<pre>
+	<!-- <pre>
 		{JSON.stringify($page.data.user, null, 2)}
-	</pre>
+	</pre> -->
 {/if}
 
 <style>

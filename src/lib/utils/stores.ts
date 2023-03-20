@@ -2,7 +2,7 @@ import type { ScheduleType } from '$lib/types/schedules'
 import { writable } from 'svelte/store'
 
 export type BookTripState = {
-	trainId: number
+	train_id: number
 	ticketTypeId: number
 	schedule_id: number
 	outbound?: ScheduleType
@@ -15,7 +15,7 @@ export type BookTripState = {
 
 // Create writable store
 export const bookTrip = writable<BookTripState>({
-	trainId: 0,
+	train_id: 0,
 	ticketTypeId: 0,
 	schedule_id: 0,
 	outbound: undefined,
@@ -27,7 +27,30 @@ export const bookTrip = writable<BookTripState>({
 	state: {},
 })
 
-export const bookingState = writable({
-	token: '',
-	product_token: '',
+export type BookingStateType = {
+	journey?: {
+		outbound: ScheduleType
+		inbound: ScheduleType
+	}
+	tokens: {
+		token: string
+		products_token: string
+	}
+	price: {
+		amount: number
+		vat: number
+		tax: number
+	}
+}
+
+export const bookingState = writable<BookingStateType>({
+	tokens: {
+		token: '',
+		products_token: '',
+	},
+	price: {
+		amount: 0,
+		vat: 0,
+		tax: 0,
+	},
 })

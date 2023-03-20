@@ -16,6 +16,7 @@
 	export let filled = false
 	export let max: number | undefined = undefined
 	export let pattern: string | undefined = undefined
+	export let required = false
 
 	function input(
 		e: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -37,6 +38,7 @@
 	value={value || ''}
 	{placeholder}
 	{id}
+	{required}
 	{disabled}
 	{pattern}
 	tabindex={tabIndex}
@@ -58,10 +60,6 @@
 		outline: 0;
 		padding: 0.65rem 0.75rem;
 		transition: border-color var(--speed-fast) ease;
-	}
-
-	.text-field:invalid {
-		border-color: red;
 	}
 
 	.text-field::placeholder {

@@ -8,6 +8,7 @@
 	export let max = month ? '9999-12' : '9999-12-31'
 	export let dateOnly = false
 	export let inputValue: Date | undefined = undefined
+	export let required = false
 	export function handleInput(e: Event) {
 		const target = e.target as HTMLInputElement
 		inputValue = new Date(target.value)
@@ -23,6 +24,7 @@
 	placeholder="test"
 	{name}
 	{max}
+	{required}
 	on:change={handleInput}
 />
 

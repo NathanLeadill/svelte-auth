@@ -2,35 +2,37 @@
 	import { bookingState } from '$lib/utils/stores'
 	import PassengerDetailsForm from './_components/passenger-details-form.svelte'
 
-	const pDetails = {}
-	let passengerDetails = [{}]
 	export let selected
-	console.log('Selected', $bookingState)
-
+	export let goToNext: () => void
 	const passengerCount = $bookingState.journey.outbound.passengers.length
+	$: passengerDetailsValid = $bookingState.journey.outbound.passengers.every(
+		(el) => {
+			if (el.firstname && el.firstname.length > 0) {
+				return true
+			}
+		}
+	)
+	function next() {
+		goToNext()
+	}
 </script>
 
-<section class="test">
-	<!-- <DetForm /> -->
-	{passengerCount}
+<section class="passenger-forms">
 	{#each Array(passengerCount) as _, i (i)}
 		<PassengerDetailsForm
 			number={i}
 			passenger={$bookingState.journey.outbound.passengers[i]}
 		/>
 	{/each}
-	<!-- <PassengerDetailsForm number={i} />
-	 {/each} -->
-	<!-- <PassengerDetailsForm
-		type={pDetails}
-		bind:details={passengerDetails[i]}
-		number={0}
-		expanded={true}
-	/> -->
+
+	<button disabled={!passengerDetailsValid} on:click={next}>Next</button>
 </section>
 
 <style>
-	.test {
+	.passenger-forms {
 		margin-top: 50px;
+		display: flex;
+		flex-direction: column;
+		gap: 50px;
 	}
 </style>

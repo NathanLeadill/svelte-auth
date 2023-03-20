@@ -1,6 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
+import type { PassengerDetailsType } from './types/account'
 import type { SearchData } from './types/destination'
 import type { ScheduleType } from './types/schedules'
+import type { VehicleType } from './types/transaction'
 import { getJourneyWithActiveRoute } from './utils/helper'
 
 export function jsonResponse<T>(data: T, status = 200): Response {
@@ -25,10 +27,17 @@ export function generateTransactionData(
 		inbound: ScheduleType[]
 	},
 	tokens,
-	passengers: PassengerDetailsType[],
-	options
+	passengers: {
+		outbound: PassengerDetailsType[]
+		inbound: PassengerDetailsType[]
+	},
+	options,
+	vehicles: {
+		outbound: VehicleType
+		inbound: VehicleType
+	}
 ) {
-	console.log('PASSENGERS', passengers)
+	console.log('searchData', searchData, 'selectedTrip', selectedTrip)
 
 	return {
 		directions: searchData.directions,
@@ -39,50 +48,19 @@ export function generateTransactionData(
 		net: 10, // fix
 		outbound: getJourneyWithActiveRoute(
 			selectedTrip.outbound[0],
-			passengers,
-			searchData.outbound?.vehicles,
+			passengers.outbound,
+			vehicles.outbound,
 			options.outbound
 		),
 		...(selectedTrip.outbound && searchData.directions.includes('inbound')
 			? {
 					inbound: getJourneyWithActiveRoute(
 						selectedTrip.inbound[0],
-						passengers,
-						searchData.inbound?.vehicles,
+						passengers.inbound,
+						vehicles.inbound,
 						options.inbound
 					),
 			  }
 			: {}),
 	}
 }
-
-/**
- * const transactionData = {
-			directions: searchData.directions,
-			channel: 'Desktop',
-			token: passengerInfo.token,
-			products_token: schedule.token,
-			amount: price,
-			net: price,
-			...($bookTrip.outbound && searchData.directions.includes('outbound')
-				? {
-						outbound: getJourney(
-							$bookTrip.outbound,
-							journey.outbound,
-							journey.transaction.outbound.passengers,
-							$bookTrip.vehicles.outbound
-						)
-				  }
-				: {}),
-			...($bookTrip.inbound && journey.transaction.inbound
-				? {
-						inbound: getJourney(
-							$bookTrip.inbound,
-							journey.inbound,
-							journey.transaction.inbound.passengers,
-							$bookTrip.vehicles.inbound
-						)
-				  }
-				: {})
-		};
- */

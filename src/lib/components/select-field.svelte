@@ -95,7 +95,7 @@
 	<div id="myDropdown" class:show={expanded} class="dropdown-content">
 		<!-- <Input bind:inputValue on:input={handleInput} /> -->
 		<input {name} value={eValue} hidden />
-		<TextField value={value ? value.label : ''} disabled />
+		<TextField value={value ? value.label : ''} disabled {error} />
 		{#if expanded}
 			<div class="body">
 				<ul class="options">
@@ -129,7 +129,7 @@
 	.dropdown-content {
 		display: none;
 		position: absolute;
-		min-width: 230px;
+		min-width: 175px;
 		border: none;
 		width: 100%;
 		margin: 0;

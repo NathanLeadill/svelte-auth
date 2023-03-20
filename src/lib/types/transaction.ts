@@ -37,6 +37,11 @@ export type PaymentDetailsType = {
 	promo?: string
 }
 
+export type TokensType = {
+	token: string
+	products_token: string
+}
+
 export type VehicleType = {
 	id: number
 	make: string

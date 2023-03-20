@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms'
-	import { invalidateAll } from '$app/navigation'
+	import { enhance } from '$app/forms'
 	import DateField from '$lib/components/date-field.svelte'
 	import SearchableSelectField from '$lib/components/searchable-select-field.svelte'
 	import SelectField from '$lib/components/select-field.svelte'
@@ -8,44 +7,53 @@
 	import type { PassengerDetailsCombined } from '$lib/types/account'
 	import type { ValidationError } from '$lib/types/common'
 	import countries from '$lib/utils/countries.json'
-	import { passengerTypeMap } from '$lib/utils/options'
+	import {
+		passengerFormRequiredFields,
+		passengerTypeIds,
+		passengerTypeMap,
+	} from '$lib/utils/options'
+	import { bookingState } from '$lib/utils/stores'
+	import type { ActionData } from '../../../../(app)/$types'
 
 	export let number: number
 	export let passenger
 	export let type = passenger.passenger_type_id
 
-	let idType: SelectObject | undefined = undefined
 	export let requiredFields: string[]
 	export let errors: ValidationError<PassengerDetailsCombined>
 
-	export let form
+	export let form: ActionData
 	export let expanded = false
+	export let disabled = false
+
+	let idType: SelectObject | undefined = undefined
+	let result: ActionData
 
 	function toggleExpanded() {
 		expanded = !expanded
 	}
 
 	function convertPassengerTypeToString(passengerType: string) {
-		return passengerTypeMap[passengerType as keyof typeof passengerTypeMap]
+		const passengerTypeString = Object.keys(passengerTypeIds).find(
+			(key) =>
+				passengerTypeIds[key as keyof typeof passengerTypeIds] ===
+				Number(passengerType)
+		)
+
+		return passengerTypeMap[
+			passengerTypeString as keyof typeof passengerTypeMap
+		]
 	}
 
 	function isRequired(field: string) {
-		// return requiredFields.includes(field) ? '*' : ''
-		return true
+		return passengerFormRequiredFields.includes(field) ? '*' : ''
 	}
 
-	$: {
-		if (errors && errors[0]) {
-			errors = errors[1]
-		}
-	}
+	console.log('Passenger', $bookingState)
+	$: console.log('Passenger', $bookingState)
 </script>
 
-<pre>
-	{JSON.stringify(form)}
-</pre>
-
-<div class="traveller-details-container">
+<div class="traveller-details-container" class:disabled>
 	<div
 		class="passenger-details-header"
 		class:expanded
@@ -63,22 +71,53 @@
 		</div>
 	</div>
 	{#if expanded}
-		<div class="passenger-details-body">
+		<div class="passenger-details-body" class:hidden={disabled}>
 			<form
 				class="login-form personal-details"
 				method="POST"
 				action="?/addPassenger"
 				use:enhance={() => {
-					return async ({ result }) => {
-						invalidateAll()
-						console.log('result', result)
+					return async ({ form, data, action, result: res }) => {
+						// invalidateAll()
+						console.log('Form', form)
+						console.log('Data', data)
+						console.log('Action', action)
+						console.log('Result', res)
+						if (res.type === 'failure') {
+							console.log('Error', res.data)
+							result = res
+							console.log('Resss', res)
+						} else {
+							disabled = true
 
-						const test = await applyAction(result)
-						console.log('Test', test)
+							bookingState.update((prev) => ({
+								...prev,
+								journey: {
+									// @todo fix this, shouldnt be this fing deep ffs
+									outbound: res.data.transaction.outbound,
+									inbound: res.data.transaction.inbound,
+								},
+							}))
+						}
+
+						// const test = await applyAction(result)
 					}
 				}}
 			>
+				{#if form?.success}<p class="error">The email field is required</p>{/if}
+				{#if form?.incorrect}<p class="error">Invalid credentials!</p>{/if}
+				<input
+					hidden
+					name="journey"
+					value={JSON.stringify($bookingState.journey)}
+				/>
+				<input hidden name="passenger_id" value={number} />
 				<input hidden name="passenger_type_id" value={type} />
+				<input
+					hidden
+					name="tokens"
+					value={JSON.stringify($bookingState.tokens)}
+				/>
 				<div class="form-group">
 					<label for="firstName">First name {isRequired('firstname')}</label>
 					<TextField
@@ -86,6 +125,7 @@
 						type="text"
 						name="firstname"
 						placeholder="Enter first name"
+						error={result?.data?.firstname}
 					/>
 				</div>
 				<div class="form-group">
@@ -95,6 +135,7 @@
 						type="text"
 						name="lastname"
 						placeholder="Enter last name"
+						error={result?.data?.lastname}
 					/>
 				</div>
 				<div class="form-group">
@@ -102,6 +143,7 @@
 					<SelectField
 						id="gender"
 						name="gender"
+						error={result?.data?.gender}
 						items={[
 							{
 								label: 'Male',
@@ -124,12 +166,17 @@
 						id="mobileNumber"
 						name="mobile"
 						type="text"
+						error={result?.data?.mobile}
 						placeholder="+44 7729280348"
 					/>
 				</div>
 				<div class="form-group">
 					<label for="email">Date of Birth {isRequired('birthday')}</label>
-					<DateField id="birthday" name="dob" />
+					<DateField
+						id="birthday"
+						name="birthday"
+						error={result?.data.birthday}
+					/>
 				</div>
 				<div class="form-group">
 					<label for="email">Email address {isRequired('email')}</label>
@@ -138,18 +185,20 @@
 						name="emailaddress"
 						type="email"
 						placeholder="Enter your email"
+						error={result?.data?.emailaddress}
 					/>
 				</div>
 				<div class="form-group">
 					<label for="email">Birth country {isRequired('birth_country')}</label>
-					<!-- <SearchableSelectField
-					id={'birth_country'}
-					bind:selected={details.birth_country}
-					items={countries.map((el) => ({
-						label: el.en_short_name,
-						value: el.alpha_3_code
-					}))}
-				/> -->
+					<SearchableSelectField
+						id={'birth_country'}
+						name={'birth_country'}
+						items={countries.map((el) => ({
+							label: el.en_short_name,
+							value: el.alpha_3_code,
+						}))}
+						error={result?.data?.birth_country}
+					/>
 				</div>
 				<div class="form-group">
 					<label for="email"
@@ -169,6 +218,7 @@
 								value: 'no',
 							},
 						]}
+						error={result?.data?.ssr}
 					/>
 				</div>
 				<div class="form-group">
@@ -188,9 +238,9 @@
 								value: 'id_card',
 							},
 						]}
+						error={result?.data?.idType}
 					/>
 				</div>
-				{JSON.stringify(idType)}
 				{#if idType}
 					<div class="passport-details">
 						<span class="passport-details-heading">Identification details</span>
@@ -199,9 +249,10 @@
 								<label for="passportNumber">Passport Number</label>
 								<TextField
 									id="passportNumber"
+									name="passport_number"
 									type="text"
 									placeholder="Enter passport number"
-									error={errors?.passport_number?.join(', ')}
+									error={result?.data?.passport_number}
 								/>
 							</div>
 
@@ -215,6 +266,8 @@
 										label: el.en_short_name,
 										value: el.alpha_3_code,
 									}))}
+									name="passport_issuing_country"
+									error={result?.data?.passport_issuing_country}
 								/>
 							</div>
 							<div class="form-group">
@@ -227,6 +280,8 @@
 										label: el.nationality,
 										value: el.alpha_3_code,
 									}))}
+									name="passport_nationality"
+									error={result?.data?.passport_nationality}
 								/>
 							</div>
 
@@ -237,7 +292,7 @@
 								<DateField
 									id="expirationDate"
 									name="passport_expiry"
-									error={errors?.passport_expiry?.join(', ')}
+									error={result?.data?.passport_expiry}
 								/>
 							</div>
 						{:else if idType === 'id_card'}
@@ -248,7 +303,7 @@
 									name="id_number"
 									type="text"
 									placeholder="Enter ID number"
-									error={errors?.id_number?.join(', ')}
+									error={result?.data?.id_number}
 								/>
 							</div>
 							<div class="form-group">
@@ -258,7 +313,7 @@
 								<DateField
 									id="id_expiry"
 									name="id_expiry"
-									error={errors?.id_expiry?.join(', ')}
+									error={result?.data?.id_expiry}
 								/>
 							</div>
 						{:else}
@@ -266,7 +321,7 @@
 						{/if}
 					</div>
 				{/if}
-				{#if form?.success}
+				{#if form?.data.incorrect}
 					<p>Success</p>
 				{/if}
 				<div class="submit-container">
@@ -289,6 +344,14 @@
 		/* height: 915px; */
 		margin: 0 auto 0 0;
 		max-width: 1080px;
+	}
+
+	.traveller-details-container.disabled {
+		opacity: 0.5;
+	}
+
+	.traveller-details-container.disabled .passenger-details-header {
+		pointer-events: none;
 	}
 	.passenger-details-header.expanded {
 		border-bottom: 0.5px solid #e4e4e4;
@@ -317,6 +380,10 @@
 		cursor: pointer;
 	}
 
+	.passenger-details-body.hidden {
+		display: none;
+	}
+
 	.passenger-details-labels {
 		flex-grow: 1;
 	}
@@ -331,6 +398,11 @@
 
 	.passenger-details-body {
 		padding: 32px 54px;
+	}
+
+	.passenger-details-body
+		:global(#myDropdown input.text-field.text-field.text-field) {
+		width: 100%;
 	}
 
 	.personal-details {
@@ -382,6 +454,10 @@
 
 	.submit-container button {
 		width: 100%;
+	}
+
+	.form-group.error {
+		background: red;
 	}
 
 	:global(input) {

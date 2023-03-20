@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
-	import { bookingState } from '$lib/utils/stores'
 
 	type TSteps = $$Generic<Record<string, string>>
 	type TValue = Readonly<keyof TSteps>
@@ -75,10 +74,6 @@
 		navigate()
 	}
 </script>
-
-<pre>
-    {JSON.stringify($bookingState)}
-</pre>
 
 <div class="wizard">
 	<div class="header-bar">

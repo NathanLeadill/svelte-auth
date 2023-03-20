@@ -11,6 +11,8 @@
 	export let items: SelectMenuOptions[] = []
 	export let eLabel: string | undefined = undefined
 	export let onSelect: (value: string) => void = () => {}
+	export let name = ''
+	export let error = ''
 
 	function select(item: SelectMenuOptions) {
 		selected = item.value
@@ -38,7 +40,7 @@
 	use:clickOutside={() => (menuOpen = false)}
 >
 	<div id="myDropdown" class:show={menuOpen} class="dropdown-content">
-		<TextField bind:value={inputValue} />
+		<TextField bind:value={inputValue} {name} {error} />
 		{#if menuOpen}
 			<div class="body">
 				<ul class="options">
@@ -70,7 +72,7 @@
 	.dropdown-content {
 		position: absolute;
 		min-width: 230px;
-		border: 1px solid #ddd;
+		/* border: 1px solid #ddd; */
 		width: 100%;
 		display: block;
 		margin: 0;

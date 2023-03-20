@@ -2,9 +2,9 @@
 	import type { ScheduleSelectedObj, TicketProduct } from '$lib/types/schedules'
 
 	export let product: TicketProduct
-	export let trainId: number
+	export let train_id: number
 	export let schedule_id: number
-	export let ticketId: number
+	export let product_id: number
 	export let type: keyof typeof group
 	export let group: ScheduleSelectedObj
 	export let selected: Partial<ScheduleSelectedObj>
@@ -12,14 +12,6 @@
 	 * class:active={schedule_id === selected[type].schedule_id &&
 			ticketId === selected[type].ticketId}
 	*/
-	console.log(
-		'Selected',
-		selected[type],
-		' schedule_id',
-		schedule_id,
-		' ticketId',
-		ticketId
-	)
 </script>
 
 <label class="label">
@@ -27,9 +19,9 @@
 		type="radio"
 		value={{
 			...selected[type],
-			trainId,
+			train_id,
 			schedule_id,
-			ticketId,
+			product_id,
 		}}
 		bind:group={group[type]}
 	/>
@@ -38,10 +30,9 @@
 		class:active={selected &&
 			selected[type] &&
 			selected[type].schedule_id === schedule_id &&
-			selected[type].ticketId === ticketId}
+			selected[type].product_id === product_id}
 	>
 		<span class="ticket-type-heading">{product.name}</span>
-		<span>{schedule_id}</span>
 		<p class="ticket-type-description">{product.description}</p>
 		<p class="ticket-type-price">
 			<span class="currency" />

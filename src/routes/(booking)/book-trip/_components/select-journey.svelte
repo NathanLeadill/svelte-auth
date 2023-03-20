@@ -23,7 +23,6 @@
 	let schedule: ScheduleReturnType = {
 		outbound: [],
 		inbound: [],
-		token: '',
 	}
 	export let selected: ScheduleSelectedObj = {
 		outbound: {
@@ -35,6 +34,7 @@
 				make: '',
 				model: '',
 				registration: '',
+				quantity: 1,
 			},
 		},
 		inbound: {
@@ -46,6 +46,7 @@
 				make: '',
 				model: '',
 				registration: '',
+				quantity: 1,
 			},
 		},
 		tokens: {
@@ -109,14 +110,24 @@
 		const activeRoute = schedule.outbound.find(
 			(route) => route.schedule_id === selected.outbound.schedule_id
 		)
+		console.log('Selected', selected)
 
 		const generatedPayload = generateTransactionData(
 			searchData,
 			schedule,
 			$bookingState.tokens,
-			passengerInfo.outbound.passengers,
-			selected
+			{
+				outbound: passengerInfo.outbound.passengers,
+				inbound: passengerInfo.inbound.passengers,
+			},
+			selected,
+			{
+				outbound: selected.outbound.vehicle,
+				inbound: selected.inbound.vehicle,
+			}
 		)
+
+		console.log('GENERATED PAYLOAD', generatedPayload)
 
 		const req = await fetch('/api/journey/transaction', {
 			method: 'POST',
@@ -132,6 +143,8 @@
 		} = await req.json()
 
 		if (status === 'success') {
+			console.log('BEFORE')
+
 			bookingState.update((prev) => ({
 				...prev,
 				journey: {
@@ -144,6 +157,8 @@
 					tax: transaction.tax,
 				},
 			}))
+			console.log('AFTER')
+
 			goToNext()
 		}
 	}
@@ -159,9 +174,6 @@
 			<div class="results-container">
 				{#if schedule}
 					<h1 class="heading">Select outbound journey</h1>
-					<pre>
-                        {JSON.stringify(selected)}
-                    </pre>
 					{#if schedule.outbound.length === 0}
 						<Loading progress={true} />
 						<div class="white-card" />

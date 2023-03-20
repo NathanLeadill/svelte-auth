@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Wizard from '$lib/components/wizard.svelte'
-	import type { PassengerDetailsType } from '$lib/types/account'
 
 	import type {
 		JourneyType,
@@ -8,8 +7,12 @@
 		SearchData,
 	} from '$lib/types/destination'
 	import { onMount } from 'svelte'
+	import Completed from './_components/completed.svelte'
 	import PassengerDetails from './_components/passenger-details.svelte'
+	import Payment from './_components/payment.svelte'
 	import SelectJourney from './_components/select-journey.svelte'
+	import SummaryColumn from './_components/summary-column.svelte'
+	import Summary from './_components/summary.svelte'
 
 	export let data
 	let searchData: SearchData
@@ -61,17 +64,11 @@
 		}
 	}
 	let journey: JourneyType
-	let passengerDetails: PassengerDetailsType[]
 	let passengerInfo: JourneyWithPassengers
-	let selected = {}
-	let test = {}
 </script>
 
 {#if !searchData?.directions}
 	<p>Redirecting...</p>
-	<pre>
-        {JSON.stringify(test, null, 2)}
-    </pre>
 {:else}
 	<Wizard
 		steps={{
@@ -87,33 +84,44 @@
 		let:goToPrevious
 		urlNavigation
 	>
+		<div class="share-container">
+			{#if value !== 'select-trip'}
+				<button on:click={goToPrevious}>Back</button>
+			{/if}
+			<button on:click={getLink}>Get Link</button>
+		</div>
 		<!-- TODO WHEN YOU SELECT A JOURNEY. UPDATE THE DAMN OBJECT!!!! -->
 		<div class="column-container" class:value>
-			<button on:click={getLink}>Get Link</button>
 			<div class="body-column">
 				{#if value === 'select-trip'}
 					<SelectJourney
-						bind:selected={test}
+						bind:selected={journey}
 						{goToNext}
 						{searchData}
-						bind:journey
 						bind:passengerInfo
 					/>
 				{:else if value === 'passenger-details'}
-					<PassengerDetails selected={test} />
 					<div class="container">
-						<h1>test</h1>
-						<pre>
-                    {JSON.stringify(test)}
-                </pre>
+						<!-- <h1>test</h1> -->
+						<PassengerDetails {goToNext} selected={journey} />
 					</div>
+				{:else if value === 'summary'}
+					<div class="container">
+						<Summary {goToNext} {journey} />
+					</div>
+				{:else if value === 'payment'}
+					<div class="container">
+						<Payment {goToNext} {journey} />
+					</div>
+				{:else if value === 'complete'}
+					<Completed />
 				{/if}
 			</div>
-			<!-- <div class="summary-column">
-			{#if journey && journey.outbound}
-				<SummaryColumn {searchData} {journey} {goToNext} />
-			{/if}
-		</div> -->
+			<div class="summary-column">
+				{#if journey && journey.outbound}
+					<SummaryColumn {searchData} {journey} />
+				{/if}
+			</div>
 		</div>
 	</Wizard>
 {/if}
@@ -134,6 +142,16 @@
 	}
 	.container {
 		margin: 100px auto;
+	}
+	.share-container {
+		padding-top: 125px;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.share-container button {
+		height: 50px;
+		width: 200px;
 	}
 	@media only screen and (max-width: 768px) {
 		.column-container {

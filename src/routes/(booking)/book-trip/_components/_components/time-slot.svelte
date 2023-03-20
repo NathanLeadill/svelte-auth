@@ -1,6 +1,8 @@
 <script lang="ts">
 	import JourneyCard from '$lib/components/journey-card.svelte'
 	import type { ScheduleSelectedObj } from '$lib/types/schedules'
+	import { bookingState } from '$lib/utils/stores'
+	import Swal from 'sweetalert2'
 	import TicketType from './ticket-type.svelte'
 	import VehicleInputs from './vehicle-inputs.svelte'
 	export let schedule: ScheduleType
@@ -33,6 +35,43 @@
 		},
 	}
 
+	async function getAvailableTickets(
+		token: string,
+		ferry_id: number,
+		direction: string
+	) {
+		const vehicle_type =
+			selected[direction as keyof typeof selected]?.vehicle.id
+		console.log('vehicle_type', vehicle_type)
+		if (!vehicle_type || vehicle_type === 0) return
+		console.log('TEST')
+
+		const response = await fetch('/api/journey/availability', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				token,
+				ferry_id,
+				vehicle_type,
+				direction,
+			}),
+		})
+		const { data, status } = await response.json()
+
+		if (status !== 'success') {
+			Swal.fire({
+				title: 'Error!',
+				text: 'Sorry, there is no space for vehicles available for this journey',
+				icon: 'error',
+				confirmButtonText: 'Continue',
+			})
+		}
+
+		// return data;
+	}
+
 	function closeMenuKeyboard(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			expanded = false
@@ -40,6 +79,12 @@
 	}
 
 	const selectInd = selected[type as keyof typeof selected]
+	$: selected[type].vehicle.id,
+		getAvailableTickets(
+			$bookingState.tokens.token,
+			selected[type].train_id,
+			type
+		)
 </script>
 
 {#if !schedule}
@@ -57,7 +102,7 @@
 			<div class="price-column">
 				<div class="price-box">
 					<p class="from-label">From</p>
-					<p class="price-label">€ 100.00</p>
+					<p class="price-label">€ {schedule.products[0].price.toFixed(2)}</p>
 				</div>
 			</div>
 		</div>
@@ -68,9 +113,9 @@
 
 					<TicketType
 						{product}
-						trainId={schedule.train_id}
+						train_id={schedule.train_id}
 						schedule_id={schedule.schedule_id}
-						ticketId={product.id}
+						product_id={product.id}
 						{selected}
 						{type}
 						bind:group={selected}
@@ -79,11 +124,12 @@
 			</div>
 		</div>
 		<div class="vehicle-section">
-			{#if selected.outbound && selected.outbound.schedule_id}
+			{#if selected[type] && selected[type].schedule_id}
 				<VehicleInputs
 					{selected}
 					{schedule}
-					bind:activeVehicle={selected.outbound.vehicle}
+					{type}
+					bind:activeVehicle={selected[type].vehicle}
 				/>
 			{/if}
 		</div>
@@ -180,6 +226,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 24px;
+	}
+
+	.ticket-slots input {
+		width: 50px;
 	}
 
 	.price-column .price-box {

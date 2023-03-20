@@ -24,7 +24,7 @@
 			value: 10,
 		},
 	]
-	const type = 'outbound'
+	export let type
 
 	export let activeVehicle = {
 		id: 0,
@@ -65,9 +65,6 @@
 			/>
 		</div>
 	</div>
-	<pre>
-	{JSON.stringify(selected[type].vehicle)}
-	</pre>
 	{#if selected[type].vehicle?.id === 2}
 		<div class="vehicle-options">
 			<div class="form-group">

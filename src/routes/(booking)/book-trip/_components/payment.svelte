@@ -14,7 +14,7 @@
 	type FormResult = {
 		type: 'success' | 'error'
 		status: number
-		error?: string
+		errors?: Record<string, string | string[]>
 		data: {
 			success: boolean
 			[error: string]: string | string[]
@@ -22,7 +22,14 @@
 	}
 
 	let error = false
-	let formResult: FormResult = {}
+	let formResult: Partial<FormResult> = {
+		errors: {
+			name: [],
+			number: [],
+			expireDate: [],
+			cvc: [],
+		},
+	}
 	let running = false
 </script>
 
@@ -39,6 +46,10 @@
 				formResult = {
 					type: result.type,
 					errors: result.data,
+				}
+
+				if (result.type === 'success') {
+					goToNext()
 				}
 			}
 		}}
@@ -59,22 +70,27 @@
 		<div class="card-info">
 			<div class="form-group">
 				<label for="name">Name</label>
+				{formResult.errors && formResult.errors.name}
 				<TextField
 					id="name"
 					type="text"
 					name="name"
 					placeholder="Miss Elizabeth Bennet"
 					required
-					error={formResult.errors && formResult.errors['name']}
+					error={formResult.errors && formResult.errors.name?.join(', ')}
+					value=" "
 				/>
 			</div>
 			<div class="form-group">
 				<label for="card-number">Card Number</label>
+				{formResult.errors && formResult.errors.number}
+
 				<CardNumberField
 					id="card-number"
 					name="card-number"
 					required
-					error={formResult.errors && formResult.errors['number']}
+					error={formResult.errors && formResult.errors.number.join(', ')}
+					value=" "
 				/>
 			</div>
 			<div class="form-group">
@@ -84,18 +100,20 @@
 					name="expire-date"
 					month={true}
 					required
-					error={formResult.errors && formResult.errors['expireDate']}
+					value={new Date()}
+					error={formResult.errors && formResult.errors.expireDate.join(', ')}
 				/>
 			</div>
 			<div class="form-group">
 				<label for="cvc">CVC</label>
+
 				<TextField
 					id="cvc"
 					type="text"
 					name="cvc"
 					placeholder="123"
 					required
-					error={formResult.errors && formResult.errors['cvc']}
+					error={formResult.errors.cvc?.join(', ')}
 				/>
 			</div>
 		</div>
@@ -106,7 +124,7 @@
 
 	<div class="footer">
 		<p class="total-label">Total Amount</p>
-		<!-- <p class="total">€ {Number($bookingState.price.amount).toFixed(2)}</p> -->
+		<p class="total">€ {Number($bookingState.price.amount).toFixed(2)}</p>
 	</div>
 	<div class="status-container">
 		{#if running}
