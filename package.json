@@ -30,6 +30,7 @@
 		"vite": "^4.1.4"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-node": "^1.2.3",
 		"bcrypt": "^5.1.0",
 		"jsonwebtoken": "^9.0.0",
 		"sweetalert2": "^11.7.3",
